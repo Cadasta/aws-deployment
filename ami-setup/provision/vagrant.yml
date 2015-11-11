@@ -1,0 +1,11 @@
+- hosts: all
+  roles:
+    - ckan_install
+    - solr_install
+    - ckan_config
+    - ckan_extension_install
+    - ckan_extension_config
+    - angular_install
+    - api_install
+    - prereqs_install
+    - prereqs_config
