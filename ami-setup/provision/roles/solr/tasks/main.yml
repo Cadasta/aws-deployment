@@ -1,0 +1,16 @@
+- name: Set up Jetty configuration
+  become: yes
+  become_user: root
+  copy: src=jetty dest=/etc/default/jetty
+
+- name: Replace Jetty schema.xml
+  become: yes
+  become_user: root
+  file: path=/etc/solr/conf/schema.xml
+        src="{{ python_virtualenv }}/src/ckan/ckan/config/solr/schema.xml"
+        state=link force=yes
+
+- name: Start Solr service
+  become: yes
+  become_user: root
+  service: name=jetty state=started
