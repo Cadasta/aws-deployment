@@ -13,4 +13,4 @@
 - name: Start Solr service
   become: yes
   become_user: root
-  service: name=jetty state=started
+  service: name=jetty state=started enabled=yes
