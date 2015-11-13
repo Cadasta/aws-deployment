@@ -33,3 +33,15 @@
   become_user: ckan
   pip: requirements="{{ python_virtualenv }}/src/ckan/requirements.txt"
        virtualenv={{ python_virtualenv }}
+
+- name: Create /etc/ckan/default
+  become: yes
+  become_user: root
+  file: path=/etc/ckan/default state=directory
+
+- name: Link who.ini file
+  become: yes
+  become_user: root
+  file: path=/etc/ckan/default/who.ini
+        src="{{ python_virtualenv }}/src/ckan/who.ini"
+        state=link

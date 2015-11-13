@@ -21,3 +21,15 @@ This comes in three parts:
 cd ami-setup
 ansible-playbook ...
 ```
+
+#### Installation steps
+
+These are the Ansible roles in this playbook:
+
+1. `ckan`: Install base CKAN and prerequisites.
+2. `solr`: Install and configure Solr.
+3. `ckan_extension`: Install and configure CKAN extension.
+4. `angular`: Install Angular application prerequisites.
+5. `api`: Install database and API code and prerequisites.
+6. `ona`: Install and configure ONA.
+7. `prereqs`: Install and configure deployment prerequisites.
