@@ -1,0 +1,35 @@
+- name: Install base CKAN OS package dependencies
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - python-dev
+    - postgresql
+    - libpq-dev
+    - python-pip
+    - python-virtualenv
+    - git-core
+    - solr-jetty
+    - openjdk-6-jdk
+
+- name: Create CKAN user
+  become: yes
+  become_user: root
+  user: name=ckan
+
+- name: Create base CKAN directory
+  become: yes
+  become_user: root
+  file: path={{ python_virtualenv }} state=directory owner=ckan
+
+- name: Install base CKAN source
+  become: yes
+  become_user: ckan
+  pip: name='git+https://github.com/ckan/ckan.git@ckan-2.4.1#egg=ckan'
+       virtualenv={{ python_virtualenv }}
+
+- name: Install base CKAN Python dependencies
+  become: yes
+  become_user: ckan
+  pip: requirements="{{ python_virtualenv }}/src/ckan/requirements.txt"
+       virtualenv={{ python_virtualenv }}
