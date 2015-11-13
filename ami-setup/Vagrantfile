@@ -4,6 +4,12 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
 
+  # 2 Gb might be overkill, but there's a Python package used by ONA
+  # that needs a lot of memory to build: it goes OOM in a 512 Mb VM.
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--memory", 2048]
+  end
+
   config.vm.provision "ansible" do |ansible|
 #    ansible.verbose = "vvv"
     ansible.playbook = "provision/vagrant.yml"

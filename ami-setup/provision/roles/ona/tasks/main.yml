@@ -1,0 +1,102 @@
+- name: Install ONA OS package dependencies
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - postgresql-9.3-postgis-2.1
+    - binutils
+    - libproj-dev
+    - gdal-bin
+    - memcached
+    - libmemcached-dev
+    - build-essential
+    - python-pip
+    - python-virtualenv
+    - python-dev
+    - git
+    - libssl-dev
+    - libpq-dev
+    - gfortran
+    - libatlas-base-dev
+    - libjpeg-dev
+    - libxml2-dev
+    - libxslt-dev
+    - zlib1g-dev
+    - python-software-properties
+    - ghostscript
+    - python-celery
+    - python-sphinx
+    - openjdk-7-jdk
+    - openjdk-7-jre
+    - postgresql-9.3-postgis-2.1
+    - postgresql-9.3-postgis-2.1-scripts
+
+- name: Create ONA user
+  become: yes
+  become_user: root
+  user: name=ona
+
+- name: Create top-level installation directory
+  become: yes
+  become_user: root
+  file: path=/opt/ona state=directory owner=ona
+
+- name: Clone ONA repository
+  become: yes
+  become_user: ona
+  git: repo=https://github.com/onaio/onadata
+       dest={{ ona_base }}
+
+- name: Install base ONA Python dependencies
+  become: yes
+  become_user: ona
+  pip: requirements="{{ ona_base }}/requirements/base.pip"
+       extra_args="--allow-all-external"
+       virtualenv={{ ona_base }}
+
+- name: Install Numpy
+  become: yes
+  become_user: ona
+  pip: name=numpy virtualenv={{ ona_base }}
+
+- name: Install Pandas
+  become: yes
+  become_user: ona
+  pip: name=pandas version=0.12.0 virtualenv={{ ona_base }}
+
+- name: Install UWSGI
+  become: yes
+  become_user: ona
+  pip: name=uwsgi virtualenv={{ ona_base }}
+
+- name: Set up UWSGI initialisation script
+  become: yes
+  become_user: ona
+  copy: src=uwsgi.ini dest=/opt/ona/uwsgi.ini
+
+- name: Set up onadata service definition
+  become: yes
+  become_user: root
+  copy: src=onadata.conf dest=/etc/init/onadata.conf
+
+- name: Install Rabbit-MQ server
+  become: yes
+  become_user: root
+  apt: pkg=rabbitmq-server state=installed update_cache=yes
+
+- name: Set up Celery service configuration
+  become: yes
+  become_user: root
+  copy: src=celeryd-ona.config dest=/etc/default/celeryd-ona
+
+- name: Set up Celery service definition
+  become: yes
+  become_user: root
+  copy: src=celeryd-ona.init dest=/etc/init.d/celeryd-ona
+        mode=0755
+
+- name: Update SysV init links for Celery
+  become: yes
+  become_user: root
+  command: /usr/sbin/update-rc.d -f celeryd-ona defaults
+           creates=/etc/rc5.d/S20celeryd-ona
