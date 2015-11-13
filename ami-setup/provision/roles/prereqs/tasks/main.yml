@@ -1,0 +1,27 @@
+- name: Install deployment prerequisite OS packages
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - apache2
+    - libapache2-mod-wsgi
+    - libapache2-mod-rpaf
+    - nginx
+    - postfix
+
+- name: Set up WSGI script
+  become: yes
+  become_user: root
+  copy: src=apache.wsgi dest=/etc/ckan/default/apache.wsgi
+
+- name: Set up nginx configuration
+  become: yes
+  become_user: root
+  copy: src=nginx.conf dest=/etc/nginx/sites-available/ckan_default
+
+- name: Modify Apache ports.conf file
+  become: yes
+  become_user: root
+  replace: dest=/etc/apache2/ports.conf
+           regexp='(NameVirtualHost\s+\*:|Listen\s+)80' replace='\g<1>8080'
+           backup=yes
