@@ -1,2 +1,2 @@
 ---
-python_virtualenv: /usr/lib/ckan/default
+ckan_base: /usr/lib/ckan/default

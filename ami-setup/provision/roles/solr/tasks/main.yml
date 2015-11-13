@@ -7,7 +7,7 @@
   become: yes
   become_user: root
   file: path=/etc/solr/conf/schema.xml
-        src="{{ python_virtualenv }}/src/ckan/ckan/config/solr/schema.xml"
+        src="{{ ckan_base }}/src/ckan/ckan/config/solr/schema.xml"
         state=link force=yes
 
 - name: Start Solr service

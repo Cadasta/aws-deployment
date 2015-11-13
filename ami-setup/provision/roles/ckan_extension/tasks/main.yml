@@ -1,0 +1,12 @@
+- name: Clone CKAN extension repository
+  become: yes
+  become_user: ckan
+  git: repo=https://github.com/Cadasta/ckanext-project
+       dest="{{ ckan_base }}/src/ckanext-project"
+
+- name: Set up CKAN extension
+  become: yes
+  become_user: ckan
+  pip: name="{{ ckan_base }}/src/ckanext-project"
+       extra_args='-e'
+       virtualenv={{ ckan_base }}

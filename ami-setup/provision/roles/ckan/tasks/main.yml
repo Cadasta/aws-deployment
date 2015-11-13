@@ -20,19 +20,19 @@
 - name: Create base CKAN directory
   become: yes
   become_user: root
-  file: path={{ python_virtualenv }} state=directory owner=ckan
+  file: path={{ ckan_base }} state=directory owner=ckan
 
 - name: Install base CKAN source
   become: yes
   become_user: ckan
   pip: name='git+https://github.com/ckan/ckan.git@ckan-2.4.1#egg=ckan'
-       virtualenv={{ python_virtualenv }}
+       virtualenv={{ ckan_base }}
 
 - name: Install base CKAN Python dependencies
   become: yes
   become_user: ckan
-  pip: requirements="{{ python_virtualenv }}/src/ckan/requirements.txt"
-       virtualenv={{ python_virtualenv }}
+  pip: requirements="{{ ckan_base }}/src/ckan/requirements.txt"
+       virtualenv={{ ckan_base }}
 
 - name: Create /etc/ckan/default
   become: yes
@@ -43,5 +43,5 @@
   become: yes
   become_user: root
   file: path=/etc/ckan/default/who.ini
-        src="{{ python_virtualenv }}/src/ckan/who.ini"
+        src="{{ ckan_base }}/src/ckan/who.ini"
         state=link

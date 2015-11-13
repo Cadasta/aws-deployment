@@ -28,7 +28,7 @@ These are the Ansible roles in this playbook:
 
 1. `ckan`: Install base CKAN and prerequisites.
 2. `solr`: Install and configure Solr.
-3. `ckan_extension`: Install and configure CKAN extension.
+3. `ckan_extension`: Install CKAN extension.
 4. `angular`: Install Angular application prerequisites.
 5. `api`: Install database and API code and prerequisites.
 6. `ona`: Install and configure ONA.
