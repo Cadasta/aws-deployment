@@ -1,0 +1,30 @@
+- name: Install Node.js and NPM
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - nodejs
+    - npm
+
+- name: Set up node->nodejs link
+  become: yes
+  become_user: root
+  file: path=/usr/bin/node src=/usr/bin/nodejs state=link
+
+- name: Install Bower and Grunt
+  become: yes
+  become_user: root
+  npm: name={{ item }} state=latest global=yes
+  with_items:
+    - bower
+    - grunt
+
+- name: Install Bower dependencies for Angular app
+  become: yes
+  become_user: ckan
+  bower: path="{{ ckan_base }}/src/ckanext-project" state=latest
+
+- name: Install NPM dependencies for Angular app
+  become: yes
+  become_user: ckan
+  npm: path="{{ ckan_base }}/src/ckanext-project" state=latest
