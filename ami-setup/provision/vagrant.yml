@@ -1,5 +1,6 @@
 - hosts: all
   roles:
+    - start_instance
     - ckan
     - solr
     - ckan_extension
@@ -7,3 +8,5 @@
     - api
     - ona
     - prereqs
+    - make_ami
+    - stop_instance

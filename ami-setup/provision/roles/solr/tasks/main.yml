@@ -9,8 +9,3 @@
   file: path=/etc/solr/conf/schema.xml
         src="{{ ckan_base }}/src/ckan/ckan/config/solr/schema.xml"
         state=link force=yes
-
-- name: Start Solr service
-  become: yes
-  become_user: root
-  service: name=jetty state=started enabled=yes
