@@ -1,12 +1,8 @@
 - hosts: all
   roles:
-    - start_instance
     - ckan
     - solr
-    - ckan_extension
     - angular
     - api
     - ona
     - prereqs
-    - make_ami
-    - stop_instance

@@ -1,0 +1,9 @@
+- name: Install Bower dependencies for Angular app
+  become: yes
+  become_user: ckan
+  bower: path="{{ ckan_base }}/src/ckanext-project" state=latest
+
+- name: Install NPM dependencies for Angular app
+  become: yes
+  become_user: ckan
+  npm: path="{{ ckan_base }}/src/ckanext-project" state=latest

@@ -2,7 +2,9 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.ssh.insert_key = false
+
+  config.vm.box = "cadasta-base"
 
   # 2 Gb might be overkill, but there's a Python package used by ONA
   # that needs a lot of memory to build: it goes OOM in a 512 Mb VM.

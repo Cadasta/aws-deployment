@@ -5,14 +5,14 @@
   tasks:
     - name: Launch instance
       ec2:
-        profile: cadasta
-        region: us-west-2
-        image: ami-5189a661
-        vpc_subnet_id: subnet-08b0856d
+        profile: "{{ aws_profile }}"
+        region: "{{ aws_region }}"
+        image: "{{ ubuntu_ami }}"
+        vpc_subnet_id: "{{ vpc_subnet_id }}"
         instance_type: t2.micro
         key_name: cadasta-utility
         group: cadasta-utility
-        instance_tags: '{ "Name": "ami-builder" }'
+        instance_tags: '{ "Name": "base-ami-builder" }'
         assign_public_ip: yes
         wait: yes
       register: ec2
@@ -31,7 +31,6 @@
   roles:
     - ckan
     - solr
-    - ckan_extension
     - angular
     - api
     - ona
@@ -44,12 +43,13 @@
   tasks:
     - name: Generate machine image from running instance
       ec2_ami:
-        profile: cadasta
-        region: us-west-2
+        profile: "{{ aws_profile }}"
+        region: "{{ aws_region }}"
         instance_id: "{{ item }}"
         wait: yes
-        name: "cadasta-v1.deploy.201511161115Z"
+        name: "{{ base_ami_name }}"
       with_items: ec2.instance_ids
+      register: ami
 
 - name: Terminate instance
   hosts: localhost
@@ -58,6 +58,14 @@
   tasks:
     - name: Terminate previously launched instance
       ec2:
-        region: us-west-2
+        region: "{{ aws_region }}"
         state: absent
         instance_ids: "{{ ec2.instance_ids }}"
+
+- name: Save AMI ID
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Dump AMI ID to file
+      command: echo "{{ ami }}"

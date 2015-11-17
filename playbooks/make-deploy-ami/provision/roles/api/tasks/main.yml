@@ -1,21 +1,8 @@
-- name: Create top-level installation directory
-  become: yes
-  become_user: root
-  file: path=/opt/cadasta state=directory owner=ckan
-
 - name: Clone Cadasta database repository
   become: yes
   become_user: ckan
   git: repo=https://github.com/Cadasta/cadasta-db
        dest=/opt/cadasta/cadasta-db
-
-- name: Install PostGIS
-  become: yes
-  become_user: root
-  apt: pkg={{ item }} state=installed update_cache=yes
-  with_items:
-    - postgis
-    - postgresql-9.3-postgis-2.1
 
 - name: Clone Cadasta API repository
   become: yes

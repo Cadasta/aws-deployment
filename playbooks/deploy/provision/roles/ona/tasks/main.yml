@@ -1,0 +1,26 @@
+- name: Set up UWSGI initialisation script
+  become: yes
+  become_user: root
+  copy: src=uwsgi.ini dest=/opt/ona/uwsgi.ini owner=ona
+
+- name: Set up onadata service definition
+  become: yes
+  become_user: root
+  copy: src=onadata.conf dest=/etc/init/onadata.conf owner=root
+
+- name: Set up Celery service configuration
+  become: yes
+  become_user: root
+  copy: src=celeryd-ona.config dest=/etc/default/celeryd-ona
+
+- name: Set up Celery service definition
+  become: yes
+  become_user: root
+  copy: src=celeryd-ona.init dest=/etc/init.d/celeryd-ona
+        mode=0755
+
+- name: Update SysV init links for Celery
+  become: yes
+  become_user: root
+  command: /usr/sbin/update-rc.d -f celeryd-ona defaults
+           creates=/etc/rc5.d/S20celeryd-ona

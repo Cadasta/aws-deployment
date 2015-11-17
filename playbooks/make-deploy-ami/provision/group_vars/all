@@ -1,0 +1,3 @@
+---
+ckan_base: /usr/lib/ckan/default
+ona_base: /opt/ona/onadata
