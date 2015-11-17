@@ -70,11 +70,11 @@ if subprocess.call(cmd) != 0:
 # Find and save new AMI ID.
 images = ec2.describe_images(Owners=['self'],
                              Filters=[{'Name': 'name',
-                                       'Values': [base_ami_name]}])
+                                       'Values': [deploy_ami_name]}])['Images']
 if len(images) != 1:
     print("Oops.  Can't find deploy image ID!")
     sys.exit(1)
-deploy_ami = images['Images'][0]['ImageId']
+deploy_ami = images[0]['ImageId']
 print("WRITING AMI ID '{}' FOR TYPE 'deploy', REGION '{}'".
       format(deploy_ami, aws_region))
 set_ami('deploy', aws_region, deploy_ami)
