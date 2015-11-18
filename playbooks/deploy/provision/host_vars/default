@@ -1,0 +1,8 @@
+---
+db_host: localhost
+db_password: ""
+deployment_name: local_test
+main_url: http://localhost:8080
+survey_url: http://localhost:8081
+ckan_app_secret: 3YaP6aGhWyLGEOoTRQAIqHeD3
+ckan_app_uuid: 864350c9-dbf0-4ccf-aa7e-d74162ea347b

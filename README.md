@@ -132,7 +132,17 @@ vagrant box add --name cadasta-deploy /big/cadasta/cadasta-deploy.box
 ```
 
 Once you've done this, you can test the deployment playbook in
-`playbooks/deploy` by doing `vagrant up --provision`.
+`playbooks/deploy`.  First do `vagrant up --no-provision` to get the
+VM running, then do the following to allow the VM access to your local
+Postgres server (since we're not going to run Postgres on the VM, you
+need a Postgres server locally):
+
+```
+vagrant ssh -- -R127.0.0.1:5432:/var/run/postgresql/.s.PGSQL.5432
+```
+
+Leave that SSH session active, and you can now do a `vagrant
+provision`.
 
 
 ### AWS prerequisites
@@ -148,3 +158,100 @@ you'll need to recreate them to be able to use these scripts:
    permitting SSH connections.
  * A key pair called `cadasta-utility` (you'll need the PEM file for
    this).
+
+
+
+### Deployment information
+
+Inputs:
+
+I1. AWS credentials and region for setup
+I2. Deployment name (must be unique)
+I3. EC2 instance type
+I4. RDS instance type and storage space
+
+Derived information:
+
+D1. Main and survey URLs (defaults: can override)
+D2. EC2 name (fixed pattern based on deployment name)
+D3. RDS name (fixed pattern based on deployment name)
+D4. S3 name (fixed pattern based on deployment name)
+D5. Names for other AWS resources (IAM roles, instance profiles, key
+    pairs, etc.)
+D6. Database access details (host, users, passwords, etc.)
+D7. Rollbar secret key (just generate one?)
+D8. RDS admin user credentials
+
+Fixed information:
+
+F1. Host IP address (should probably be set to localhost, since we're
+    putting everything on one EC2 instance).
+F2. ONA endpoint
+
+References:
+
+private-settings/cadasta-api/settings.js: D7
+private-settings/cadasta-api/environment- settings.js: D4, D6, F1, F2
+CKAN database creation: D3, D8
+CKAN config file creation: D3, I2, D1
+Solr database creation: D3, D8
+Cadasta database creation: D3, D8
+ONA database setup: D3, D8
+Other ONA setup: ?
+
+Fixed AWS resources:
+
+ * IAM policies: EC2 trust policy, policy for instance profile
+
+AWS resources:
+
+ * VPC
+ * Public subnet (EC2 instance)
+ * Private subnet (RDS instance)
+
+
+### Required code changes
+
+Change L12-13 of cadasta-api/app/routes/resources.js from:
+
+var AWS = require('aws-sdk');
+AWS.config.update({accessKeyId: settings.s3.awsAccessKey, secretAccessKey: settings.s3.awsSecretKey});
+
+to:
+
+var AWS = require('aws-sdk');
+if (settings.s3.hasOwnProperty('useEC2MetadataCredentials') &&
+    settings.s3useEC2MetadataCredentials)
+  AWS.config.credentials = new AWS.EC2MetadataCredentials();
+else
+  AWS.config.update({ accessKeyId: settings.s3.awsAccessKey,
+                      secretAccessKey: settings.s3.awsSecretKey });
+
+
+### Ports
+
+ * ONA: 8000
+ * CKAN: 5000
+ * Cadasta API: 3000
+ * Apache/nginx: 8080/80
+ * Postgres: 5432
+
+
+### Ansible variables for deployment step
+
+db_host: PostgreSQL host
+db_password: PostgreSQL "postgres" user password
+deployment_name: Simple name for deployment (letters, digits, underscore only)
+main_url: Main "front page" endpoint
+survey_url: ONA endpoint
+ckan_app_secret: Secret token for CKAN cookies (25 characters) (app_instance_secret = secret.secret_string())
+ckan_app_uid: UUID for CKAN config file (app_instance_uuid = str(uuid.uuid4()))
+
+
+import random
+import string
+import uuid
+
+app_instance_secret = ''.join([random.choice(string.ascii_letters + string.digits)
+                               for n in range(25)])
+app_instance_uuid = str(uuid.uuid4())

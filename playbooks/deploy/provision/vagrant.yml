@@ -1,0 +1,9 @@
+- hosts: all
+  roles:
+    - ckan
+#    - solr
+#    - ckan_extension
+#    - angular
+#    - api
+#    - ona
+#    - web

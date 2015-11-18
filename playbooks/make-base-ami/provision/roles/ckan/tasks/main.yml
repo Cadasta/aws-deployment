@@ -4,13 +4,14 @@
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
     - python-dev
-    - postgresql
+    - postgresql-client
     - libpq-dev
     - python-pip
     - python-virtualenv
     - git-core
     - solr-jetty
     - openjdk-6-jdk
+    - python-psycopg2
 
 - name: Create CKAN user
   become: yes
@@ -37,7 +38,7 @@
 - name: Create /etc/ckan/default
   become: yes
   become_user: root
-  file: path=/etc/ckan/default state=directory
+  file: path=/etc/ckan/default state=directory owner=ckan
 
 - name: Link who.ini file
   become: yes

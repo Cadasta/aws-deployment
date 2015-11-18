@@ -1,0 +1,29 @@
+- name: Create CKAN database user
+  postgresql_user: name=ckan_default
+                   login_host="{{db_host}}"
+                   login_password="{{db_password}}"
+
+- name: Create CKAN database
+  postgresql_db: name=ckan_default encoding='UTF-8' owner=ckan_default
+                 login_host="{{db_host}}"
+                 login_password="{{db_password}}"
+
+- name: Create CKAN storage directory
+  become: yes
+  become_user: root
+  file: path=/var/lib/ckan/default/storage state=directory
+        owner=www-data group=www-data
+
+- name: Create CKAN configuration file
+  become: yes
+  become_user: ckan
+  template: src=ckan.ini dest=/etc/ckan/default/production.ini owner=ckan
+
+- name: Check for existence of CKAN database tables
+  shell: psql -h {{db_host}} -U postgres ckan_default -c '\d task_status'
+  register: db_tables_exist
+  ignore_errors: true
+
+- name: Create CKAN database tables
+  script: make-db-tables.sh
+  when: db_tables_exist|failed
