@@ -1,12 +1,47 @@
-- name: Set up UWSGI initialisation script
+- name: Set up ONA settings.py
   become: yes
   become_user: root
-  copy: src=uwsgi.ini dest=/opt/ona/uwsgi.ini owner=ona
+  template: src=local_settings.py dest=/opt/ona/onadata/local_settings.py
+            owner=ona
 
-- name: Set up onadata service definition
+- name: Create ONA database user
+  postgresql_user: name=onadata password=onadata
+                   login_host="{{db_host}}"
+                   login_password="{{db_password}}"
+
+- name: Create ONA database
+  postgresql_db: name=onadata owner=onadata
+                 login_host="{{db_host}}"
+                 login_password="{{db_password}}"
+
+- name: Check for existence of ONA database tables
+  shell: psql -h {{db_host}} -U postgres onadata -c '\d django_site'
+  register: db_tables_exist
+  ignore_errors: true
+
+- name: Create ONA database tables
   become: yes
-  become_user: root
-  copy: src=onadata.conf dest=/etc/init/onadata.conf owner=root
+  become_user: ona
+  script: make-db-tables.sh
+  when: db_tables_exist|failed
+
+- name: Copy ONA static files
+  become: yes
+  become_user: ona
+  script: collect-static-files.sh
+          creates=/opt/ona/onadata/onadata/static/404.html
+
+- name: Check for existence of ONA superuser
+  shell: psql -h {{db_host}} -U postgres onadata -c "select id from auth_user where username='ona'"
+  register: superuser_test
+  ignore_errors: true
+
+- name: Create ONA superuser
+  become: yes
+  become_user: ona
+  script: create-superuser.sh
+          creates=/opt/ona/onadata/onadata/static/404.html
+  when: superuser_test.stdout.find('0') != -1
 
 - name: Set up Celery service configuration
   become: yes
@@ -19,8 +54,23 @@
   copy: src=celeryd-ona.init dest=/etc/init.d/celeryd-ona
         mode=0755
 
+- name: Create Celery log directory
+  become: yes
+  become_user: root
+  file: path=/var/log/ona state=directory owner=ona group=ona
+
+- name: Create Celery PID directory
+  become: yes
+  become_user: root
+  file: path=/var/run/ona state=directory owner=ona group=ona
+
 - name: Update SysV init links for Celery
   become: yes
   become_user: root
   command: /usr/sbin/update-rc.d -f celeryd-ona defaults
            creates=/etc/rc5.d/S20celeryd-ona
+
+- name: Start Celery service
+  become: yes
+  become_user: root
+  service: name=celeryd-ona state=started enabled=yes

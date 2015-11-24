@@ -1,7 +1,7 @@
 - name: Install deployment prerequisite OS packages
   become: yes
   become_user: root
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=present update_cache=yes
   with_items:
     - apache2
     - libapache2-mod-wsgi
@@ -9,15 +9,25 @@
     - nginx
     - postfix
 
-- name: Set up WSGI script
+- name: Uninstall PostgreSQL server
   become: yes
   become_user: root
-  copy: src=apache.wsgi dest=/etc/ckan/default/apache.wsgi
+  apt: pkg=postgresql-9.3 state=absent
+
+- name: Set up CKAN WSGI script
+  become: yes
+  become_user: root
+  copy: src=ckan-apache.wsgi dest=/etc/ckan/default/apache.wsgi
+
+- name: Set up ONA WSGI script
+  become: yes
+  become_user: root
+  copy: src=ona-apache.wsgi dest=/etc/ona/onadata/apache.wsgi
 
 - name: Set up nginx configuration
   become: yes
   become_user: root
-  copy: src=nginx.conf dest=/etc/nginx/sites-available/ckan_default
+  copy: src=nginx.conf dest=/etc/nginx/sites-available/cadasta
 
 - name: Modify Apache ports.conf file
   become: yes

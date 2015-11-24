@@ -1,0 +1,37 @@
+- name: Set up Apache configuration
+  become: yes
+  become_user: root
+  template: src=cadasta-apache-site
+            dest=/etc/apache2/sites-available/cadasta.conf
+            owner=root group=root mode=0644
+
+- name: Enable Cadasta Apache site
+  become: yes
+  become_user: root
+  shell: a2ensite cadasta
+
+- name: Disable default Apache site
+  become: yes
+  become_user: root
+  shell: a2dissite 000-default
+
+- name: Disable default nginx site
+  become: yes
+  become_user: root
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: Enable Cadasta nginx site
+  become: yes
+  become_user: root
+  file: path=/etc/nginx/sites-enabled/cadasta
+        src=/etc/nginx/sites-available/cadasta state=link
+
+- name: Restart Apache
+  become: yes
+  become_user: root
+  service: name=apache2 state=restarted
+
+- name: Restart nginx
+  become: yes
+  become_user: root
+  service: name=nginx state=restarted

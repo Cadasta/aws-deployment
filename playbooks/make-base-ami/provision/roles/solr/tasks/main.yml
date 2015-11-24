@@ -1,11 +1,11 @@
-- name: Set up Jetty configuration
+- name: Set up Tomcat configuration
   become: yes
   become_user: root
-  copy: src=jetty dest=/etc/default/jetty
+  replace: dest=/etc/tomcat6/server.xml regexp=8080 replace=8983
 
-- name: Replace Jetty schema.xml
+- name: Replace base schema.xml
   become: yes
   become_user: root
   file: path=/etc/solr/conf/schema.xml
-        src="{{ ckan_base }}/src/ckan/ckan/config/solr/schema.xml"
+        src="/usr/lib/ckan/default/src/ckan/ckan/config/solr/schema.xml"
         state=link force=yes

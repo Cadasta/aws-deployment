@@ -1,0 +1,63 @@
+- name: Create Cadasta database user
+  postgresql_user: name=cadasta
+                   login_host="{{db_host}}"
+                   login_password="{{db_password}}"
+
+- name: Create Cadasta database
+  postgresql_db: name=cadasta encoding='UTF-8' owner=cadasta
+                 lc_collate='en_US.utf8' lc_ctype='en_US.utf8'
+                 template=template0
+                 login_host="{{db_host}}"
+                 login_password="{{db_password}}"
+
+- name: Check for existence of Cadasta database tables
+  shell: psql -h {{db_host}} -U postgres cadasta -c '\d parcel_history'
+  register: db_tables_exist
+  ignore_errors: true
+
+- name: Create Cadasta database tables
+  script: make-db-tables.sh
+  when: db_tables_exist|failed
+
+- name: Set up API settings files
+  become: yes
+  become_user: ckan
+  template: src=settings.js
+            dest=/opt/cadasta/cadasta-api/app/settings/settings.js
+            owner=ckan
+
+- name: Set up API environment settings files
+  become: yes
+  become_user: ckan
+  template: src=environment-settings.js
+            dest=/opt/cadasta/cadasta-api/app/settings/environment-settings.js
+            owner=ckan
+
+- name: Build API
+  become: yes
+  become_user: ckan
+  script: build-api.sh
+
+- name: Install PM2 process manager
+  become: yes
+  become_user: root
+  npm: name=pm2 state=latest global=yes
+
+- name: Create PM2 startup script
+  become: yes
+  become_user: root
+  command: pm2 startup ubuntu -u ckan --hp /home/ckan
+           creates=/home/ckan/.pm2
+
+- name: Start the API server
+  become: yes
+  become_user: ckan
+  command: pm2 start app/app.js --name cadasta-api -- --env production
+           chdir=/opt/cadasta/cadasta-api
+           creates=/home/ckan/.pm2/pids/cadasta-api-0.pid
+
+- name: Save PM2 restart state
+  become: yes
+  become_user: ckan
+  command: pm2 save
+           creates=/home/ckan/.pm2/dump.pm2

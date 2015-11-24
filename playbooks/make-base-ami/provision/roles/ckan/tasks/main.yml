@@ -1,7 +1,7 @@
 - name: Install base CKAN OS package dependencies
   become: yes
   become_user: root
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=present update_cache=yes
   with_items:
     - python-dev
     - postgresql-client
@@ -9,7 +9,7 @@
     - python-pip
     - python-virtualenv
     - git-core
-    - solr-jetty
+    - solr-tomcat
     - openjdk-6-jdk
     - python-psycopg2
 
@@ -21,19 +21,19 @@
 - name: Create base CKAN directory
   become: yes
   become_user: root
-  file: path={{ ckan_base }} state=directory owner=ckan
+  file: path=/usr/lib/ckan/default state=directory owner=ckan
 
 - name: Install base CKAN source
   become: yes
   become_user: ckan
   pip: name='git+https://github.com/ckan/ckan.git@ckan-2.4.1#egg=ckan'
-       virtualenv={{ ckan_base }}
+       virtualenv=/usr/lib/ckan/default
 
 - name: Install base CKAN Python dependencies
   become: yes
   become_user: ckan
-  pip: requirements="{{ ckan_base }}/src/ckan/requirements.txt"
-       virtualenv={{ ckan_base }}
+  pip: requirements="/usr/lib/ckan/default/src/ckan/requirements.txt"
+       virtualenv=/usr/lib/ckan/default
 
 - name: Create /etc/ckan/default
   become: yes
@@ -44,5 +44,5 @@
   become: yes
   become_user: root
   file: path=/etc/ckan/default/who.ini
-        src="{{ ckan_base }}/src/ckan/who.ini"
+        src="/usr/lib/ckan/default/src/ckan/who.ini"
         state=link

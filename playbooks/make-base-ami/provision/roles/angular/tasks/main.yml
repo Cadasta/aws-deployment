@@ -1,7 +1,7 @@
 - name: Install Node.js and NPM
   become: yes
   become_user: root
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=present update_cache=yes
   with_items:
     - nodejs
     - npm
@@ -17,4 +17,4 @@
   npm: name={{ item }} state=latest global=yes
   with_items:
     - bower
-    - grunt
+    - grunt-cli

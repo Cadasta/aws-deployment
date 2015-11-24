@@ -1,9 +1,8 @@
 - name: Install ONA OS package dependencies
   become: yes
   become_user: root
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=present update_cache=yes
   with_items:
-    - postgresql-9.3-postgis-2.1
     - binutils
     - libproj-dev
     - gdal-bin
@@ -45,31 +44,31 @@
   become: yes
   become_user: ona
   git: repo=https://github.com/onaio/onadata
-       dest={{ ona_base }}
+       dest=/opt/ona/onadata
 
 - name: Install base ONA Python dependencies
   become: yes
   become_user: ona
-  pip: requirements="{{ ona_base }}/requirements/base.pip"
+  pip: requirements="/opt/ona/onadata/requirements/base.pip"
        extra_args="--allow-all-external"
-       virtualenv={{ ona_base }}
+       virtualenv=/opt/ona/onadata
 
 - name: Install Numpy
   become: yes
   become_user: ona
-  pip: name=numpy virtualenv={{ ona_base }}
+  pip: name=numpy virtualenv=/opt/ona/onadata
 
 - name: Install Pandas
   become: yes
   become_user: ona
-  pip: name=pandas version=0.12.0 virtualenv={{ ona_base }}
-
-- name: Install UWSGI
-  become: yes
-  become_user: ona
-  pip: name=uwsgi virtualenv={{ ona_base }}
+  pip: name=pandas version=0.12.0 virtualenv=/opt/ona/onadata
 
 - name: Install Rabbit-MQ server
   become: yes
   become_user: root
-  apt: pkg=rabbitmq-server state=installed update_cache=yes
+  apt: pkg=rabbitmq-server state=present update_cache=yes
+
+- name: Create /etc/ona/onadata
+  become: yes
+  become_user: root
+  file: path=/etc/ona/onadata state=directory owner=ona

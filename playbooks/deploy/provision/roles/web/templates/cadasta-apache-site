@@ -1,0 +1,51 @@
+<Directory /etc/ckan/default>
+  Require all granted
+</Directory>
+
+<VirtualHost 127.0.0.1:8080>
+  ServerName {{ main_url }}
+  ServerAlias www.{{ main_url }}
+  WSGIScriptAlias / /etc/ckan/default/apache.wsgi
+
+  # Pass authorization info on (needed for rest api).
+  WSGIPassAuthorization On
+
+  # Deploy as a daemon (avoids conflicts between CKAN instances).
+  WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15
+
+  WSGIProcessGroup ckan_default
+
+  ErrorLog /var/log/apache2/ckan_default.error.log
+  CustomLog /var/log/apache2/ckan_default.custom.log combined
+
+  <IfModule mod_rpaf.c>
+    RPAFenable On
+    RPAFsethostname On
+    RPAFproxy_ips 127.0.0.1
+  </IfModule>
+</VirtualHost>
+
+<VirtualHost 127.0.0.1:8080>
+  ServerName {{ survey_url }}
+  ServerAlias www.{{ survey_url }}
+  WSGIScriptAlias / /etc/ona/onadata/apache.wsgi
+
+  # Pass authorization info on (needed for rest api).
+  WSGIPassAuthorization On
+
+  # Deploy as a daemon (avoids conflicts between instances).
+  WSGIDaemonProcess onadata display-name=onadata processes=2 threads=15
+
+  WSGIProcessGroup onadata
+
+  ErrorLog /var/log/apache2/onadata.error.log
+  CustomLog /var/log/apache2/onadata.custom.log combined
+
+  Alias /static /opt/ona/onadata/onadata/static
+
+  <IfModule mod_rpaf.c>
+    RPAFenable On
+    RPAFsethostname On
+    RPAFproxy_ips 127.0.0.1
+  </IfModule>
+</VirtualHost>

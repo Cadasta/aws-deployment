@@ -1,8 +1,15 @@
 ---
 db_host: localhost
-db_password: ""
+db_password: postgres
 deployment_name: local_test
-main_url: http://localhost:8080
-survey_url: http://localhost:8081
+main_url: http://cadasta-vagrant.local
+survey_url: http://cadasta-vagrant-survey.local
 ckan_app_secret: 3YaP6aGhWyLGEOoTRQAIqHeD3
 ckan_app_uuid: 864350c9-dbf0-4ccf-aa7e-d74162ea347b
+api_use_rollbar: "false"
+api_rollbar_key: ""
+aws_region: us-west-2
+s3_bucket: cadasta-test-bucket
+ona_app_secret: wDB6LpYDNpMC8FnRXT0K0BflM
+server_ip: 0.0.0.0
+domain_name: cadasta-vagrant.local

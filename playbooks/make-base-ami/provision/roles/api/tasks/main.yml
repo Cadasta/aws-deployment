@@ -6,7 +6,7 @@
 - name: Install PostGIS
   become: yes
   become_user: root
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=present update_cache=yes
   with_items:
     - postgis
     - postgresql-9.3-postgis-2.1
