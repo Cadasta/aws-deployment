@@ -1,9 +1,9 @@
 - name: Set up environment settings for Angular application
   become: yes
   become_user: root
-  copy: src=environment-settings.js
-        dest=/usr/lib/ckan/default/src/ckanext-project/environment-settings.js
-        owner=ckan
+  template: src=environment-settings.js
+            dest=/usr/lib/ckan/default/src/ckanext-project/environment-settings.js
+            owner=ckan
 
 - name: Build Angular application
   become: yes

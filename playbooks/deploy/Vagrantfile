@@ -14,6 +14,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.network :forwarded_port, guest: 80, host: 7000
   config.vm.hostname = "cadasta-vagrant.local"
+  config.hostmanager.aliases = "cadasta-vagrant-survey.local"
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
 

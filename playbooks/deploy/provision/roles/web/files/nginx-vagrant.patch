@@ -1,0 +1,16 @@
+--- nginx-orig.conf	2015-11-25 11:18:24.837680498 +0100
++++ nginx-patched.conf	2015-11-25 11:20:35.860897622 +0100
+@@ -12,7 +12,13 @@
+         proxy_no_cache $cookie_auth_tkt;
+         proxy_cache_valid 30m;
+         proxy_cache_key $host$scheme$proxy_host$request_uri;
++        proxy_redirect http://cadasta-vagrant.local/ http://cadasta-vagrant.local:7000/;
++        sub_filter http://cadasta-vagrant.local/ http://cadasta-vagrant.local:7000/;
++        sub_filter_once off;
++        sub_filter_types "*";
++
+         # In emergency comment out line to force caching
+         # proxy_ignore_headers X-Accel-Expires Expires Cache-Control;
+     }
+ }
++

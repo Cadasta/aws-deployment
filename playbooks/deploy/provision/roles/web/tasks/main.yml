@@ -26,6 +26,19 @@
   file: path=/etc/nginx/sites-enabled/cadasta
         src=/etc/nginx/sites-available/cadasta state=link
 
+- name: (VAGRANT LOCAL ONLY) Disable Apache file compression
+  become: yes
+  become_user: root
+  file: path=/etc/apache2/mods-enabled/deflate.load state=absent
+  when: "{{ vagrant_local | default(false) }}"
+
+- name: (VAGRANT LOCAL ONLY) Set up nginx URL rewriting
+  become: yes
+  become_user: root
+  patch: src=nginx-vagrant.patch
+         dest=/etc/nginx/sites-available/cadasta
+  when: "{{ vagrant_local | default(false) }}"
+
 - name: Restart Apache
   become: yes
   become_user: root

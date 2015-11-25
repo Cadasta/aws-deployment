@@ -3,8 +3,8 @@
 </Directory>
 
 <VirtualHost 127.0.0.1:8080>
-  ServerName {{ main_url }}
-  ServerAlias www.{{ main_url }}
+  ServerName {{ apache_main_url }}
+  ServerAlias www.{{ apache_main_url }}
   WSGIScriptAlias / /etc/ckan/default/apache.wsgi
 
   # Pass authorization info on (needed for rest api).
@@ -26,8 +26,8 @@
 </VirtualHost>
 
 <VirtualHost 127.0.0.1:8080>
-  ServerName {{ survey_url }}
-  ServerAlias www.{{ survey_url }}
+  ServerName {{ apache_survey_url }}
+  ServerAlias www.{{ apache_survey_url }}
   WSGIScriptAlias / /etc/ona/onadata/apache.wsgi
 
   # Pass authorization info on (needed for rest api).

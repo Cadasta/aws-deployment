@@ -59,11 +59,11 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = [
     "{{ server_ip }}",
-    "{{ domain_name }}",
+    "{{ ona_domain_name }}",
     "127.0.0.1"
 ]
 CORS_ORIGIN_WHITELIST = (
-    "{{ domain_name }}",
+    "{{ ona_domain_name }}",
     "{{ server_ip }}",
     'localhost:3000',
     'localhost:4000',
@@ -90,5 +90,5 @@ CORS_EXPOSE_HEADERS = (
     'Content-Type', 'Location', 'WWW-Authenticate', 'Content-Language',
 )
 
-MEDIA_URL = "http://{{ domain_name }}/media/"
+MEDIA_URL = "{{ ona_survey_url }}/media/"
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media/')

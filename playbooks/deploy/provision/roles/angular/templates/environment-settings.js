@@ -1,6 +1,6 @@
 module.exports = {
   production: {
     apiCadastaRoot: 'http://localhost:3000',
-    apiCKANRoot: 'http://localhost:5000/api/3/action'
+    apiCKANRoot: '{{ ckan_main_url }}/api/3/action'
   }
 };
