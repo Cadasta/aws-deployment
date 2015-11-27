@@ -2,7 +2,7 @@ module.exports = {
   "production": {
     "pg":{
       "user":      "cadasta",
-      "password":  "{{ db_password }}",
+      "password":  "cadasta",
       "server":    "{{ db_host }}",
       "port":      "5432",
       "database":  "cadasta",

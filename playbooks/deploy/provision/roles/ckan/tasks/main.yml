@@ -1,12 +1,31 @@
+- name: Create Postgres password file for CKAN
+  become: yes
+  become_user: root
+  copy: src=ckan-pgpass dest=/home/ckan/.pgpass owner=ckan mode=0600
+
+# This test is needed because of a bad interaction between the way
+# that the Ansible postgresql_user modules works and the way that
+# Amazon RDS PostgreSQL instances have their admin roles set up.
+
+- name: Check for existence of CKAN database user
+  become: true
+  become_user: ckan
+  shell: psql -h {{db_host}} -U postgres
+         -c "select rolname from pg_roles where rolname='ckan_default'"
+  register: user_test
+  ignore_errors: true
+
 - name: Create CKAN database user
-  postgresql_user: name=ckan_default
+  postgresql_user: name=ckan_default password=ckan_default
+                   role_attr_flags=CREATEDB state=present
                    login_host="{{db_host}}"
-                   login_password="{{db_password}}"
+                   login_user="postgres" login_password="{{db_password}}"
+  when: user_test.stdout.find('0') != -1
 
 - name: Create CKAN database
   postgresql_db: name=ckan_default encoding='UTF-8' owner=ckan_default
                  login_host="{{db_host}}"
-                 login_password="{{db_password}}"
+                 login_user="ckan_default" login_password="ckan_default"
 
 - name: Create CKAN storage directory
   become: yes
@@ -20,10 +39,14 @@
   template: src=ckan.ini dest=/etc/ckan/default/production.ini owner=ckan
 
 - name: Check for existence of CKAN database tables
-  shell: psql -h {{db_host}} -U postgres ckan_default -c '\d task_status'
+  become: yes
+  become_user: ckan
+  shell: psql -h {{db_host}} -U ckan_default -c '\d task_status'
   register: db_tables_exist
   ignore_errors: true
 
 - name: Create CKAN database tables
+  become: yes
+  become_user: ckan
   script: make-db-tables.sh
   when: db_tables_exist|failed

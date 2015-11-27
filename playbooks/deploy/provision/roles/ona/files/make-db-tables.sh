@@ -1,6 +1,6 @@
 #!/bin/bash
+export PGHOST=$1
 export PGDATABASE=onadata
-export PGHOST=localhost
 export PGUSER=onadata
 psql -U postgres -c 'CREATE EXTENSION IF NOT EXISTS postgis;'
 psql -U postgres -c 'CREATE EXTENSION IF NOT EXISTS postgis_topology;'

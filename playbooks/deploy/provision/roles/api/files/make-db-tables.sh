@@ -1,8 +1,8 @@
 #!/bin/bash
 cd /opt/cadasta/cadasta-db/sql
-export PGDATABASE=cadasta
-export PGHOST=localhost
+export PGHOST=$1
 export PGUSER=cadasta
+export PGDATABASE=cadasta
 psql -U postgres -c 'CREATE EXTENSION postgis;'
 psql -f 1_db.sql
 psql -f 2_field-data-tables.sql

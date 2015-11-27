@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+
+import os.path, sys, re, textwrap
+import random, string, uuid
+
+import config
+
+
+#----------------------------------------------------------------------
+#
+#  CONFIGURATION OPTIONS
+#
+
+RDS_INSTANCES = [ 'db.m3.medium', 'db.m3.large', 'db.m3.xlarge',
+                  'db.m3.2xlarge',
+                  'db.r3.large', 'db.r3.xlarge', 'db.r3.2xlarge',
+                  'db.r3.4xlarge', 'db.r3.8xlarge',
+                  'db.t2.micro', 'db.t2.small', 'db.t2.medium', 'db.t2.large' ]
+
+EC2_INSTANCES = [ 't2.micro', 't2.small', 't2.medium', 't2.large',
+                  'm4.large', 'm4.xlarge', 'm4.2xlarge',
+                  'm4.4xlarge', 'm4.10xlarge',
+                  'm3.medium', 'm3.large', 'm3.xlarge', 'm3.2xlarge',
+                  'c4.large', 'c4.xlarge', 'c4.2xlarge',
+                  'c4.4xlarge', 'c4.8xlarge',
+                  'c3.large', 'c3.xlarge', 'c3.2xlarge',
+                  'c3.4xlarge', 'c3.8xlarge',
+                  'r3.large', 'r3.xlarge', 'r3.2xlarge',
+                  'r3.4xlarge', 'r3.8xlarge',
+                  'g2.2xlarge', 'g2.8xlarge',
+                  'i2.xlarge', 'i2.2xlarge', 'i2.4xlarge', 'i2.8xlarge',
+                  'd2.xlarge', 'd2.2xlarge', 'd2.4xlarge', 'd2.8xlarge' ]
+
+print("""
+
+This script will ask for the information required to set up a Cadasta
+V1 deployment.
+
+This script does not perform any actions apart from collecting
+configuration information.  Once you've provided the required
+information, you can run the aws-resources script to create the
+required AWS resources, then the deploy script to deploy the platform
+to those resources.
+
+To get help for any of the configuration options, just answer "?" at
+the prompt.
+""")
+
+def name_check(p):
+    if re.match('^[A-Za-z][A-Za-z0-9]*$' , p) is None:
+        print('Name must be alphanumeric, e.g. "CadastaTest3"')
+        return False
+    else:
+        return True
+
+config.get('deployment_name', 'Deployment name',
+"""This name is used to tag all the AWS entities used and to refer to
+the deployment more generally.  Must be alphanumeric.""",
+          check=name_check)
+config.set()
+if os.path.exists(config.file):
+    print('Deployment "{}" already exists!'.format(config.vals['deployment_name']))
+    sys.exit(1)
+
+
+def camel_to_snake(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s1).lower()
+
+prefix = config.vals['deployment_name']
+snprefix = camel_to_snake(prefix)
+
+config.get('ckan_main_url', 'Main endpoint URL',
+"""This is the host part of the URL used to access the Cadasta "front
+page".""",
+          default=snprefix+'.cadasta.org')
+config.vals['apache_main_url'] = config.vals['ckan_main_url']
+config.vals['ona_domain_name'] = config.vals['ckan_main_url']
+config.vals['ckan_main_url'] = 'http://' + config.vals['ckan_main_url']
+
+config.get('ona_survey_url', 'Survey endpoint URL',
+"""This is the host part of the URL used to access the Cadasta "front
+page".""",
+          default=snprefix+'-survey.cadasta.org')
+config.vals['apache_survey_url'] = config.vals['ona_survey_url']
+config.vals['ona_survey_url'] = 'http://' + config.vals['ona_survey_url']
+
+
+def instance_help(type, name, instances):
+    help = (type + ' instance type for the ' + name +
+            '.  Must be one of the following:')
+    help = textwrap.fill(help) + '\n\n'
+    help += '\n'.join(map(lambda s: '  ' + s,
+                          textwrap.wrap(', '.join(instances), 75)))
+    return help
+
+config.get('ec2_instance_type', 'EC2 instance type for platform processes',
+          instance_help('EC2', 'platform processes', EC2_INSTANCES),
+          values=EC2_INSTANCES)
+
+config.get('rds_instance_type', 'RDS instance type for Postgres database',
+          instance_help('RDS', 'Postgres database', RDS_INSTANCES),
+          values=RDS_INSTANCES)
+
+
+config.vals['db_password'] = 'postgres'
+config.vals['s3_bucket'] = '-'.join(['cadasta',
+                                     config.vals['deployment_name'],
+                                     'bucket'])
+
+
+# Create CKAN and ONA application secrets and CKAN UUID.
+
+config.vals['ckan_app_secret'] = ''.join([random.choice(string.ascii_letters +
+                                                        string.digits)
+                                          for n in range(25)])
+config.vals['ckan_app_uuid'] = str(uuid.uuid4())
+config.vals['ona_app_secret'] = ''.join([random.choice(string.ascii_letters +
+                                                       string.digits)
+                                         for n in range(25)])
+
+config.write()

@@ -1,3 +1,8 @@
+- name: Create Postgres password file for www-data
+  become: yes
+  become_user: root
+  copy: src=www-pgpass dest=/var/www/.pgpass owner=www-data mode=0600
+
 - name: Set up Apache configuration
   become: yes
   become_user: root

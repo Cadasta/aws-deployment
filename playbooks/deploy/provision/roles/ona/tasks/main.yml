@@ -4,25 +4,46 @@
   template: src=local_settings.py dest=/opt/ona/onadata/local_settings.py
             owner=ona
 
+- name: Create Postgres password file for ONA
+  become: yes
+  become_user: root
+  copy: src=ona-pgpass dest=/home/ona/.pgpass owner=ona mode=0600
+
+# This test is needed because of a bad interaction between the way
+# that the Ansible postgresql_user modules works and the way that
+# Amazon RDS PostgreSQL instances have their admin roles set up.
+
+- name: Check for existence of ONA database user
+  become: true
+  become_user: ona
+  shell: psql -h {{db_host}} -U postgres
+         -c "select rolname from pg_roles where rolname='onadata'"
+  register: user_test
+  ignore_errors: true
+
 - name: Create ONA database user
   postgresql_user: name=onadata password=onadata
+                   role_attr_flags=CREATEDB state=present
                    login_host="{{db_host}}"
-                   login_password="{{db_password}}"
+                   login_user="postgres" login_password="{{db_password}}"
+  when: user_test.stdout.find('0') != -1
 
 - name: Create ONA database
   postgresql_db: name=onadata owner=onadata
                  login_host="{{db_host}}"
-                 login_password="{{db_password}}"
+                 login_user="onadata" login_password="onadata"
 
 - name: Check for existence of ONA database tables
-  shell: psql -h {{db_host}} -U postgres onadata -c '\d django_site'
+  become: true
+  become_user: ona
+  shell: psql -h {{db_host}} -U onadata -c '\d django_site'
   register: db_tables_exist
   ignore_errors: true
 
 - name: Create ONA database tables
   become: yes
   become_user: ona
-  script: make-db-tables.sh
+  script: "make-db-tables.sh {{db_host}}"
   when: db_tables_exist|failed
 
 - name: Copy ONA static files
@@ -32,7 +53,9 @@
           creates=/opt/ona/onadata/onadata/static/404.html
 
 - name: Check for existence of ONA superuser
-  shell: psql -h {{db_host}} -U postgres onadata -c "select id from auth_user where username='ona'"
+  become: true
+  become_user: ona
+  shell: psql -h {{db_host}} -U onadata -c "select id from auth_user where username='ona'"
   register: superuser_test
   ignore_errors: true
 

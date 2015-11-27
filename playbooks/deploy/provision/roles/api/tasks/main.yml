@@ -1,22 +1,60 @@
+###  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  ###
+###                                                                 ###
+###   INSTALLING dev BRANCH OF cadasta-db HERE BECAUSE master IS    ###
+###   OUT OF DATE.  MUST BE FIXED!                                  ###
+###                                                                 ###
+###  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  ###
+
+- name: Clone Cadasta database repository
+  become: yes
+  become_user: ckan
+  git: repo=https://github.com/Cadasta/cadasta-db
+       dest=/opt/cadasta/cadasta-db
+       version=dev
+
+- name: Clone Cadasta API repository
+  become: yes
+  become_user: ckan
+  git: repo=https://github.com/Cadasta/cadasta-api
+       dest=/opt/cadasta/cadasta-api
+
+# This test is needed because of a bad interaction between the way
+# that the Ansible postgresql_user modules works and the way that
+# Amazon RDS PostgreSQL instances have their admin roles set up.
+
+- name: Check for existence of CKAN database user
+  become: true
+  become_user: ckan
+  shell: psql -h {{db_host}} -U postgres
+         -c "select rolname from pg_roles where rolname='cadasta'"
+  register: user_test
+  ignore_errors: true
+
 - name: Create Cadasta database user
-  postgresql_user: name=cadasta
+  postgresql_user: name=cadasta password=cadasta
+                   role_attr_flags=CREATEDB state=present
                    login_host="{{db_host}}"
-                   login_password="{{db_password}}"
+                   login_user="postgres" login_password="{{db_password}}"
+  when: user_test.stdout.find('0') != -1
 
 - name: Create Cadasta database
   postgresql_db: name=cadasta encoding='UTF-8' owner=cadasta
                  lc_collate='en_US.utf8' lc_ctype='en_US.utf8'
                  template=template0
                  login_host="{{db_host}}"
-                 login_password="{{db_password}}"
+                 login_user="cadasta" login_password="cadasta"
 
 - name: Check for existence of Cadasta database tables
-  shell: psql -h {{db_host}} -U postgres cadasta -c '\d parcel_history'
+  become: yes
+  become_user: ckan
+  shell: psql -h {{db_host}} -U cadasta -c '\d parcel_history'
   register: db_tables_exist
   ignore_errors: true
 
 - name: Create Cadasta database tables
-  script: make-db-tables.sh
+  become: yes
+  become_user: ckan
+  script: "make-db-tables.sh {{db_host}}"
   when: db_tables_exist|failed
 
 - name: Set up API settings files

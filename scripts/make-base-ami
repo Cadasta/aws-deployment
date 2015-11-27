@@ -8,7 +8,7 @@ from datetime import datetime, timezone, timedelta
 from ami import get_ami, set_ami
 
 if len(sys.argv) != 3:
-    print('Usage: make-base-ami.py aws-profile private-key-file')
+    print('Usage: make-base-ami aws-profile private-key-file')
     sys.exit(1)
 
 # AWS profile and private key file to use.
