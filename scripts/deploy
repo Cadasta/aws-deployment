@@ -88,7 +88,9 @@ template_parameters = [('Region',          aws_region),
                        ('DeployAMI',       deploy_ami),
                        ('EC2InstanceType', config.vals['ec2_instance_type']),
                        ('RDSInstanceType', config.vals['rds_instance_type']),
-                       ('RDSStorage',      str(config.vals['rds_storage']))]
+                       ('RDSStorage',      str(config.vals['rds_storage'])),
+                       ('DNSMain',         config.vals['apache_main_url'] + '.'),
+                       ('DNSSurvey',       config.vals['apache_survey_url'] + '.')]
 template_parameters_dict = [dict([('ParameterKey', k), ('ParameterValue', v)])
                             for k, v in template_parameters]
 response = cfn.create_stack(StackName=stack_name,
@@ -103,10 +105,11 @@ print("""
 
              WAITING FOR CLOUDFORMATION STACK TO BECOME ACTIVE....
 
-The stack may take quite a long time to become active.  AWS needs to
-create an RDS database instance and all the associated networking
-infrastructure (and it creates an initial database backup as it does
-that) as well as the EC2 instance used to host the platform.
+The stack may take quite a long time to become active (often around
+12-13 minutes).  AWS needs to create an RDS database instance and all
+the associated networking infrastructure (and it creates an initial
+database backup as it does that) as well as the EC2 instance used to
+host the platform.
 
 If you want to watch what's happening, you can log in to the AWS
 Console in your browser and look on the CloudFormation page -- you'll
@@ -140,9 +143,9 @@ print('Stack {} successfully created.  Provisioning...'.format(stack_name))
 
 ec2_name = deployment_name + '-ec2'
 ec2 = aws.client('ec2')
-ec2s = ec2.describe_instances(Filters=[{'Name': 'tag:Name',
-                                        'Values': [ec2_name]}])
-ec2s = ec2s['Reservations'][0]['Instances']
+ec2s = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [ec2_name]}])
+ec2s = [ec2['Instances'][0] for ec2 in ec2s['Reservations']
+        if ec2['Instances'][0]['State']['Name'] == 'running']
 if len(ec2s) != 1:
     print("Oops.  Can't find EC2 instance!")
     sys.exit(1)

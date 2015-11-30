@@ -39,6 +39,14 @@
       "Type": "Number",
       "Description": "RDS storage in Gb",
       "Default": 10
+    },
+    "DNSMain": {
+      "Type": "String",
+      "Description": "DNS domain name for main endpoint"
+    },
+    "DNSSurvey": {
+      "Type": "String",
+      "Description": "DNS domain name for survey endpoint"
     }
   },
   "Resources": {
@@ -354,6 +362,26 @@
         "GroupId": {"Ref": "sgdbsg"},
         "IpProtocol": "-1",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "dns1" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+        "HostedZoneName" : "cadasta.org.",
+        "Name" : {"Ref": "DNSMain"},
+        "Type" : "A",
+        "TTL" : "900",
+        "ResourceRecords" : [{"Ref": "eip"}]
+      }
+    },
+    "dns2" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+        "HostedZoneName" : "cadasta.org.",
+        "Name" : {"Ref": "DNSSurvey"},
+        "Type" : "A",
+        "TTL" : "900",
+        "ResourceRecords" : [{"Ref": "eip"}]
       }
     }
   },
