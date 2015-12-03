@@ -177,22 +177,23 @@ config.write()
 
 work_dir = normpath(join(dirname(abspath(__file__)),
                          '../playbooks/deploy/provision'))
-extra_vars = [('apache_main_url',   config.vals['apache_main_url']),
-              ('apache_survey_url', config.vals['apache_survey_url']),
-              ('api_rollbar_key',   config.vals['api_rollbar_key']),
-              ('api_use_rollbar',   config.vals['api_use_rollbar']),
-              ('aws_region',        config.vals['aws_region']),
-              ('ckan_app_secret',   config.vals['ckan_app_secret']),
-              ('ckan_app_uuid',     config.vals['ckan_app_uuid']),
-              ('ckan_main_url',     config.vals['ckan_main_url']),
-              ('db_host',           config.vals['db_host']),
-              ('db_password',       config.vals['db_password']),
-              ('deployment_name',   config.vals['deployment_name']),
-              ('ona_app_secret',    config.vals['ona_app_secret']),
-              ('ona_domain_name',   config.vals['ona_domain_name']),
-              ('ona_survey_url',    config.vals['ona_survey_url']),
-              ('s3_bucket',         config.vals['s3_bucket']),
-              ('server_ip',         config.vals['server_ip'])]
+extra_vars = [('apache_main_url',    config.vals['apache_main_url']),
+              ('apache_survey_url',  config.vals['apache_survey_url']),
+              ('api_rollbar_key',    config.vals['api_rollbar_key']),
+              ('api_use_rollbar',    config.vals['api_use_rollbar']),
+              ('aws_region',         config.vals['aws_region']),
+              ('ckan_app_secret',    config.vals['ckan_app_secret']),
+              ('ckan_app_uuid',      config.vals['ckan_app_uuid']),
+              ('ckan_main_url',      config.vals['ckan_main_url']),
+              ('db_host',            config.vals['db_host']),
+              ('db_password',        config.vals['db_password']),
+              ('deployment_name',    config.vals['deployment_name']),
+              ('ona_app_secret',     config.vals['ona_app_secret']),
+              ('ona_domain_name',    config.vals['ona_domain_name']),
+              ('ona_survey_url',     config.vals['ona_survey_url']),
+              ('ona_admin_password', config.vals['ona_admin_password']),
+              ('s3_bucket',          config.vals['s3_bucket']),
+              ('server_ip',          config.vals['server_ip'])]
 extra_vars = ' '.join(map(lambda p: p[0] + '=' + p[1], extra_vars))
 
 

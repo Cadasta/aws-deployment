@@ -85,6 +85,16 @@ page".""",
 config.vals['apache_survey_url'] = config.vals['ona_survey_url']
 config.vals['ona_survey_url'] = 'http://' + config.vals['ona_survey_url']
 
+default_ona_password = (prefix + '-' +
+                        ''.join([random.choice(string.ascii_letters +
+                                               string.digits)
+                                 for n in range(5)]))
+
+config.get('ona_admin_password', 'ONA administrator password',
+"""This is the password used to access the Django administrator pages in
+the ONA instance, needed for setting up project users for form
+uploads.""", default=default_ona_password)
+
 
 def instance_help(type, name, instances):
     help = (type + ' instance type for the ' + name +

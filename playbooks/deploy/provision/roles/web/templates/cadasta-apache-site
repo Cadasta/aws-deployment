@@ -11,7 +11,7 @@
   WSGIPassAuthorization On
 
   # Deploy as a daemon (avoids conflicts between CKAN instances).
-  WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15
+  WSGIDaemonProcess ckan_default processes=2 threads=15
 
   WSGIProcessGroup ckan_default
 
@@ -25,6 +25,14 @@
   </IfModule>
 </VirtualHost>
 
+<Directory /etc/ona/onadata>
+  Require all granted
+</Directory>
+
+<Directory /opt/ona/onadata>
+  Require all granted
+</Directory>
+
 <VirtualHost 127.0.0.1:8080>
   ServerName {{ apache_survey_url }}
   ServerAlias www.{{ apache_survey_url }}
@@ -34,7 +42,7 @@
   WSGIPassAuthorization On
 
   # Deploy as a daemon (avoids conflicts between instances).
-  WSGIDaemonProcess onadata display-name=onadata processes=2 threads=15
+  WSGIDaemonProcess onadata python-path=/opt/ona/onadata:/opt/ona/onadata/lib/python2.7/site-packages processes=2 threads=1
 
   WSGIProcessGroup onadata
 

@@ -9,26 +9,27 @@ config_dir = normpath(join(dirname(abspath(__file__)), '../deployments'))
 file = None
 
 vals = {
-    'deployment_name':   None,
-    'db_host':           None,
-    'db_password':       None,
-    'ckan_main_url':     None,
-    'apache_main_url':   None,
-    'ona_survey_url':    None,
-    'apache_survey_url': None,
-    'ckan_app_secret':   None,
-    'ckan_app_uuid':     None,
-    'api_use_rollbar':   '"false"',
-    'api_rollbar_key':   '""',
-    'aws_region':        None,
-    's3_bucket':         None,
-    'ona_app_secret':    None,
-    'server_ip':         '0.0.0.0',
-    'ona_domain_name':   None,
-    'ec2_instance_type': 't2.micro',
-    'rds_instance_type': 'db.t2.micro',
-    'rds_storage':       10,
-    'public_ip':         None
+    'deployment_name':    None,
+    'db_host':            None,
+    'db_password':        None,
+    'ckan_main_url':      None,
+    'apache_main_url':    None,
+    'ona_survey_url':     None,
+    'ona_admin_password': None,
+    'apache_survey_url':  None,
+    'ckan_app_secret':    None,
+    'ckan_app_uuid':      None,
+    'api_use_rollbar':    '"false"',
+    'api_rollbar_key':    '""',
+    'aws_region':         None,
+    's3_bucket':          None,
+    'ona_app_secret':     None,
+    'server_ip':          '0.0.0.0',
+    'ona_domain_name':    None,
+    'ec2_instance_type':  't2.micro',
+    'rds_instance_type':  'db.t2.micro',
+    'rds_storage':        10,
+    'public_ip':          None
 }
 
 def set(name=None):

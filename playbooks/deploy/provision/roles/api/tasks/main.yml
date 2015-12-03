@@ -1,16 +1,8 @@
-###  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  ###
-###                                                                 ###
-###   INSTALLING dev BRANCH OF cadasta-db HERE BECAUSE master IS    ###
-###   OUT OF DATE.  MUST BE FIXED!                                  ###
-###                                                                 ###
-###  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  ###
-
 - name: Clone Cadasta database repository
   become: yes
   become_user: ckan
   git: repo=https://github.com/Cadasta/cadasta-db
        dest=/opt/cadasta/cadasta-db
-       version=dev
 
 - name: Clone Cadasta API repository
   become: yes
@@ -75,6 +67,11 @@
   become: yes
   become_user: ckan
   script: build-api.sh
+
+- name: Install extra API Python dependencies
+  become: yes
+  become_user: root
+  pip: requirements=/opt/cadasta/cadasta-api/node_modules/cadasta-provider-ona/requirements.txt
 
 - name: Install PM2 process manager
   become: yes

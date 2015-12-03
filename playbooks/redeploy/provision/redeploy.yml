@@ -1,0 +1,9 @@
+- name: Provision EC2 instance
+  hosts: all
+  remote_user: ubuntu
+  gather_facts: true
+  roles:
+    - ckan_extension
+    - angular
+    - api
+    - web

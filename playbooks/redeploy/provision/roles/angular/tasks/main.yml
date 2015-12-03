@@ -1,0 +1,22 @@
+- name: Install Bower dependencies for Angular app
+  become: yes
+  become_user: ckan
+  bower: path=/usr/lib/ckan/default/src/ckanext-project state=latest
+
+- name: Install NPM dependencies for Angular app
+  become: yes
+  become_user: ckan
+  npm: path=/usr/lib/ckan/default/src/ckanext-project state=latest
+
+- name: Set up environment settings for Angular application
+  become: yes
+  become_user: root
+  template: src=environment-settings.js
+            dest=/usr/lib/ckan/default/src/ckanext-project/environment-settings.js
+            owner=ckan
+
+- name: Build Angular application
+  become: yes
+  become_user: ckan
+  command: grunt build --env production
+           chdir=/usr/lib/ckan/default/src/ckanext-project

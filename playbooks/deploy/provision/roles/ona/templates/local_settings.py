@@ -21,7 +21,9 @@ DATABASE_ROUTERS = []  # turn off second database
 
 # Make a unique unique key just for testing, and don't share it with anybody.
 SECRET_KEY = '{{ ona_app_secret }}'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
 
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
@@ -70,25 +72,14 @@ CORS_ORIGIN_WHITELIST = (
     'localhost:8000'
 )
 
-# Google credentials
-# GOOGLE_SITE_VERIFICATION = ''
-# GOOGLE_ANALYTICS_PROPERTY_ID = ''
-# GOOGLE_ANALYTICS_DOMAIN = ''
-
 # Flags
 TESTING_MODE = False
-
-# Enketo settings
-# ENKETO_URL = '127.0.0.1:8005'
-# ENKETO_PREVIEW_URL = ENKETO_URL + 'webform/preview'
-# ENKETO_API_INSTANCE_IFRAME_URL = ENKETO_URL + 'api_v2/instance/iframe'
-# ENKETO_API_TOKEN = 'enketo_api_token'
-# ENKETO_API_SURVEY_PATH = '/api_v2/survey'
-# ENKETO_PROTOCOL = 'http'
 
 CORS_EXPOSE_HEADERS = (
     'Content-Type', 'Location', 'WWW-Authenticate', 'Content-Language',
 )
 
 MEDIA_URL = "{{ ona_survey_url }}/media/"
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media/')
+MEDIA_ROOT = '/var/ona/media/'
+
+DEFAULT_FROM_EMAIL = 'info@{{ deployment_name }}-survey.cadasta.org'

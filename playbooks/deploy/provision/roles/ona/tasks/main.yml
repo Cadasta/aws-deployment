@@ -4,6 +4,11 @@
   template: src=local_settings.py dest=/opt/ona/onadata/local_settings.py
             owner=ona
 
+- name: Create ONA media directory
+  become: yes
+  become_user: root
+  file: path=/var/ona/media state=directory owner=www-data group=www-data
+
 - name: Create Postgres password file for ONA
   become: yes
   become_user: root
@@ -43,7 +48,7 @@
 - name: Create ONA database tables
   become: yes
   become_user: ona
-  script: "make-db-tables.sh {{db_host}}"
+  script: "make-db-tables.sh {{db_host}} {{apache_survey_url}}"
   when: db_tables_exist|failed
 
 - name: Copy ONA static files
@@ -55,15 +60,14 @@
 - name: Check for existence of ONA superuser
   become: true
   become_user: ona
-  shell: psql -h {{db_host}} -U onadata -c "select id from auth_user where username='ona'"
+  shell: psql -h {{db_host}} -U onadata -c "select id from auth_user where username='admin'"
   register: superuser_test
   ignore_errors: true
 
 - name: Create ONA superuser
   become: yes
   become_user: ona
-  script: create-superuser.sh
-          creates=/opt/ona/onadata/onadata/static/404.html
+  script: create-superuser.sh {{ona_admin_password}}
   when: superuser_test.stdout.find('0') != -1
 
 - name: Set up Celery service configuration

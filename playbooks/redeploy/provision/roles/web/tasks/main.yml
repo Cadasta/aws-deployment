@@ -1,0 +1,9 @@
+- name: Restart Apache
+  become: yes
+  become_user: root
+  service: name=apache2 state=restarted
+
+- name: Restart nginx
+  become: yes
+  become_user: root
+  service: name=nginx state=restarted
