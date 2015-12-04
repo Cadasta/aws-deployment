@@ -12,7 +12,8 @@ module.exports = {
     "hostIp":  "0.0.0.0",
     "s3" : {
       "bucket": "{{ s3_bucket }}",
-      "domain": "https://s3-{{ aws_region }}.amazonaws.com"
+      "domain": "https://s3-{{ aws_region }}.amazonaws.com",
+      "useEC2MetadataCredentials": true
     },
     "ona": {
       "host": "{{ apache_survey_url }}",
