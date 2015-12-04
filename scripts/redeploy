@@ -97,7 +97,7 @@ extra_vars = ' '.join(map(lambda p: p[0] + '=' + p[1], extra_vars))
 
 tmp_hosts = tempfile.mkstemp()[1]
 with open(tmp_hosts, 'w') as tmp_fp:
-    print(public_ip, file=tmp_fp)
+    print(config.vals['public_ip'], file=tmp_fp)
 
 
 # Run provisioning playbook.

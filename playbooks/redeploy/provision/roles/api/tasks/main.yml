@@ -3,12 +3,14 @@
   become_user: ckan
   git: repo=https://github.com/Cadasta/cadasta-db
        dest=/opt/cadasta/cadasta-db
+       force=yes
 
 - name: Clone Cadasta API repository
   become: yes
   become_user: ckan
   git: repo=https://github.com/Cadasta/cadasta-api
        dest=/opt/cadasta/cadasta-api
+       force=yes
 
 - name: Set up API settings files
   become: yes

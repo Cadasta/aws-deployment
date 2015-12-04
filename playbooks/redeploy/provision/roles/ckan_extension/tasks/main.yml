@@ -3,6 +3,7 @@
   become_user: ckan
   git: repo=https://github.com/Cadasta/ckanext-project
        dest=/usr/lib/ckan/default/src/ckanext-project
+       force=yes
 
 - name: Set up CKAN extension
   become: yes
