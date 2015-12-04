@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os.path, sys, re, textwrap
 import random, string, uuid
@@ -114,9 +114,6 @@ config.get('rds_instance_type', 'RDS instance type for Postgres database',
 
 
 config.vals['db_password'] = 'postgres'
-config.vals['s3_bucket'] = '-'.join(['cadasta',
-                                     config.vals['deployment_name'],
-                                     'bucket'])
 
 
 # Create CKAN and ONA application secrets and CKAN UUID.
