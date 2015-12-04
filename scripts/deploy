@@ -74,6 +74,30 @@ if stack_name in stack_names:
     sys.exit(1)
 
 
+# Set up unique S3 bucket name.
+
+s3 = aws.client('s3')
+
+def bucket_exists(b):
+    try:
+        res = s3.head_bucket(Bucket=b)
+        return True
+    except:
+        return False
+
+def bucket_candidate(i):
+    b = '-'.join(['cadasta', config.vals['deployment_name'], 'bucket'])
+    if i > 0: b += '-' + str(i)
+    return b
+
+i = 0
+config.vals['s3_bucket'] = bucket_candidate(i)
+while bucket_exists(config.vals['s3_bucket']):
+    i = i + 1
+    config.vals['s3_bucket'] = bucket_candidate(i)
+config.write()
+
+
 # Create CloudFormation stack.
 
 print('\nCreating deployment CloudFormation stack...')
@@ -90,7 +114,8 @@ template_parameters = [('Region',          aws_region),
                        ('RDSInstanceType', config.vals['rds_instance_type']),
                        ('RDSStorage',      str(config.vals['rds_storage'])),
                        ('DNSMain',         config.vals['apache_main_url'] + '.'),
-                       ('DNSSurvey',       config.vals['apache_survey_url'] + '.')]
+                       ('DNSSurvey',       config.vals['apache_survey_url'] + '.'),
+                       ('S3Bucket',        config.vals['s3_bucket'])]
 template_parameters_dict = [dict([('ParameterKey', k), ('ParameterValue', v)])
                             for k, v in template_parameters]
 response = cfn.create_stack(StackName=stack_name,

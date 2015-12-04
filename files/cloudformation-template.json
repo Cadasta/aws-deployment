@@ -47,6 +47,10 @@
     "DNSSurvey": {
       "Type": "String",
       "Description": "DNS domain name for survey endpoint"
+    },
+    "S3Bucket": {
+      "Type": "String",
+      "Description": "S3 bucket to use for resource storage"
     }
   },
   "Resources": {
@@ -214,8 +218,7 @@
       "Type": "AWS::S3::Bucket",
       "Properties": {
         "AccessControl": "Private",
-        "BucketName": {"Fn::Join": ["-", ["cadasta", {"Ref": "Deployment"},
-                                          "bucket"]]},
+        "BucketName": {"Ref": "S3Bucket"},
         "CorsConfiguration": {
           "CorsRules": [{
             "AllowedHeaders": ["Authorization"],
