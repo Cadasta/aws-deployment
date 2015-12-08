@@ -24,11 +24,6 @@
   become_user: root
   copy: src=ona-apache.wsgi dest=/etc/ona/onadata/apache.wsgi
 
-- name: Set up nginx configuration
-  become: yes
-  become_user: root
-  copy: src=nginx.conf dest=/etc/nginx/sites-available/cadasta
-
 - name: Modify Apache ports.conf file
   become: yes
   become_user: root

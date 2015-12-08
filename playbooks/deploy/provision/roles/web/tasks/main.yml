@@ -10,6 +10,13 @@
             dest=/etc/apache2/sites-available/cadasta.conf
             owner=root group=root mode=0644
 
+- name: Set up nginx configuration
+  become: yes
+  become_user: root
+  template: src=cadasta-nginx-site
+            dest=/etc/nginx/sites-available/cadasta
+            owner=root group=root mode=0644
+
 - name: Enable Cadasta Apache site
   become: yes
   become_user: root
