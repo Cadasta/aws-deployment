@@ -46,6 +46,12 @@
   git: repo=https://github.com/onaio/onadata
        dest=/opt/ona/onadata
 
+- name: Fix up ONA Python dependencies
+  become: yes
+  become_user: ona
+  copy: src=ona-requirements-base.pip
+        dest="/opt/ona/onadata/requirements/base.pip"
+
 - name: Install base ONA Python dependencies
   become: yes
   become_user: ona
