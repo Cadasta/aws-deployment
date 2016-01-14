@@ -13,6 +13,7 @@ deployment_name: local_test
 ona_app_secret: wDB6LpYDNpMC8FnRXT0K0BflM
 ona_domain_name: cadasta-vagrant.local
 ona_survey_url: http://cadasta-vagrant-survey.local:7000
+ona_admin_password: admin
 s3_bucket: cadasta-test-bucket
 server_ip: 0.0.0.0
 vagrant_local: true

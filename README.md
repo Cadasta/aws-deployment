@@ -131,9 +131,6 @@ you'll need to recreate them to be able to use these scripts:
 
 ### Using Vagrant
 
-**WARNING: I've not re-tested this I made changes to make things work
-"for real" on AWS.  It might work, or it might not...**
-
 As well as making AMIs and deploying to an AWS EC2 instance, you can
 also run all the Ansible provisioning steps within Vagrant, which is
 handy for debugging.
@@ -145,8 +142,8 @@ prerequisites for the Cadasta platform.  You can save this as a
 Vagrant box for use later by doing
 
 ```
-vagrant package --output /big/cadasta/cadasta-base.box
-vagrant box add --name cadasta-base /big/cadasta/cadasta-base.box
+vagrant package --output /big/cadasta/cadasta-deploy.box
+vagrant box add --name cadasta-base /big/cadasta/cadasta-deploy.box
 ```
 
 Once you've done this, you can test the deployment playbook in
