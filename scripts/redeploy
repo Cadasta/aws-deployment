@@ -7,9 +7,11 @@ from os.path import normpath, join, dirname, abspath
 from ami import get_ami
 import config
 
+# "redeploy" or "provision"
+action = os.path.basename(__file__)
 
 if len(sys.argv) != 4:
-    print('Usage: redeploy aws-profile private-key-file deployment-name')
+    print('Usage: {} aws-profile private-key-file deployment-name'.format(action))
     sys.exit(1)
 
 
@@ -71,8 +73,13 @@ if stack_name not in stack_names:
 
 # Set up Ansible provisioning command parameters.
 
+if action == 'redeploy':
+    playbook = 'redeploy'
+else:
+    playbook = 'deploy'
+
 work_dir = normpath(join(dirname(abspath(__file__)),
-                         '../playbooks/redeploy/provision'))
+                         '../playbooks/{}/provision'.format(playbook)))
 extra_vars = [('apache_main_url',    config.vals['apache_main_url']),
               ('apache_survey_url',  config.vals['apache_survey_url']),
               ('api_rollbar_key',    config.vals['api_rollbar_key']),
@@ -108,7 +115,7 @@ cmd = ['ansible-playbook',
        '--private-key=' + private_key_file,
        '--inventory-file=' + tmp_hosts,
        '--extra-vars', extra_vars,
-       'redeploy.yml']
+       '{}.yml'.format(playbook)]
 if subprocess.call(cmd) != 0:
     print('\n\nansible-playbook TERMINATED INCORRECTLY!\n\n')
 else:
