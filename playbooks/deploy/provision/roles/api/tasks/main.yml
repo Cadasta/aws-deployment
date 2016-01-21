@@ -75,7 +75,7 @@
 - name: Install PM2 process manager
   become: yes
   become_user: root
-  npm: name=pm2 state=latest global=yes
+  command: npm install -g pm2
 
 - name: Create PM2 startup script
   become: yes

@@ -1,7 +1,8 @@
 - name: Install NPM dependencies for Angular app
   become: yes
   become_user: ckan
-  npm: path=/usr/lib/ckan/default/src/ckanext-project state=latest
+  command: npm install
+           chdir=/usr/lib/ckan/default/src/ckanext-project
 
 - name: Install Bower dependencies for Angular app
   become: yes
