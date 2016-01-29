@@ -121,6 +121,6 @@ if subprocess.call(cmd) != 0:
     print('\n\nansible-playbook TERMINATED INCORRECTLY!\n\n')
 else:
     print('\n\nPROVISIONING COMPLETED!\n\n')
-    print('See deployments/{}.json file for details\n'.
+    print('See s3://cadasta-secrets/ckan-deployments/{}.json for details\n'.
           format(config.vals['deployment_name']))
 os.remove(tmp_hosts)
