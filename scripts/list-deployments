@@ -8,7 +8,7 @@ import config
 
 
 if len(sys.argv) != 2:
-    print('Usage: create-deployment aws-profile')
+    print('Usage: list-deployments aws-profile')
     sys.exit(1)
 
 aws_profile = sys.argv[1]
