@@ -20,15 +20,6 @@ private_key_file = sys.argv[2]
 deployment_name = sys.argv[3]
 
 
-# Open and read deployment configuration file.
-
-config.set(deployment_name)
-if not os.path.exists(config.file):
-    print('Deployment "{}" does not exist!'.format(deployment_name))
-    sys.exit(1)
-config.read()
-
-
 # Make sure profile works and look up region from profile.
 
 try:
@@ -37,6 +28,16 @@ except:
     print('FAILED TO CREATE AWS SESSION USING PROFILE "' + aws_profile + '"')
     sys.exit(1)
 aws_region = aws._session.get_config_variable('region')
+
+
+# Read deployment configuration information.
+
+config.set_session(aws)
+config.set(deployment_name)
+if not config.exists():
+    print('Deployment "{}" does not exist!'.format(deployment_name))
+    sys.exit(1)
+config.read()
 config.vals['aws_region'] = aws_region
 
 

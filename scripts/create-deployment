@@ -2,6 +2,7 @@
 
 import os.path, sys, re, textwrap
 import random, string, uuid
+import boto3
 
 import config
 
@@ -31,6 +32,26 @@ EC2_INSTANCES = [ 't2.micro', 't2.small', 't2.medium', 't2.large',
                   'i2.xlarge', 'i2.2xlarge', 'i2.4xlarge', 'i2.8xlarge',
                   'd2.xlarge', 'd2.2xlarge', 'd2.4xlarge', 'd2.8xlarge' ]
 
+if len(sys.argv) != 2:
+    print('Usage: create-deployment aws-profile')
+    sys.exit(1)
+
+
+# AWS profile to use.
+
+aws_profile = sys.argv[1]
+
+
+# Make sure profile works and hook up the configuration manager.
+
+try:
+    aws = boto3.session.Session(profile_name=aws_profile)
+    config.set_session(aws)
+except:
+    print('FAILED TO CREATE AWS SESSION USING PROFILE "' + aws_profile + '"')
+    sys.exit(1)
+
+
 print("""
 
 This script will ask for the information required to set up a Cadasta
@@ -58,7 +79,7 @@ config.get('deployment_name', 'Deployment name',
 the deployment more generally.  Must be alphanumeric.""",
           check=name_check)
 config.set()
-if os.path.exists(config.file):
+if config.exists():
     print('Deployment "{}" already exists!'.format(config.vals['deployment_name']))
     sys.exit(1)
 

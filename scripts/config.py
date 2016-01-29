@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 
-from os.path import normpath, join, dirname, abspath, exists
+import os.path
 import json
+import textwrap
 
+# S3 bucket for storing secrets.
+s3_bucket = 'cadasta-secrets'
+s3_folder = 'ckan-deployments/'
 
-config_dir = normpath(join(dirname(abspath(__file__)), '../deployments'))
+# S3 bucket and key.
+bucket = None
+key = None
 
-file = None
-
+# Deployment options.
 vals = {
     'deployment_name':    None,
     'db_host':            None,
@@ -32,37 +37,61 @@ vals = {
     'public_ip':          None
 }
 
+
+def set_session(aws=None):
+    global bucket
+    bucket = aws.resource('s3').Bucket(s3_bucket)
+
+
+def list():
+    return [os.path.basename(o.key)
+            for o in bucket.objects.filter(Prefix=s3_folder)
+            if o.key.endswith('.json')]
+
+
+def exists(name=None):
+    if name is None:
+        name = vals['deployment_name']
+    return name + '.json' in list()
+
+
 def set(name=None):
-    global file
+    global key
     if name:
         vals['deployment_name'] = name
-    file = join(config_dir, vals['deployment_name'] + '.json')
+    key = os.path.join(s3_folder, vals['deployment_name'] + '.json')
+
 
 def write():
-    with open(file, 'w', encoding='utf-8') as fp:
-        json.dump(vals, fp, sort_keys=True, indent=4)
+    body = json.dumps(vals, sort_keys=True, indent=4)
+    bucket.put_object(Body=body.encode(),
+                      ContentType='application/json',
+                      Key=key)
+
 
 def read():
     global vals
-    if exists(file):
-        with open(file, encoding='utf-8') as fp:
-            vals = json.load(fp)
+    body = bucket.Object(key).get()['Body'].read()
+    vals = json.loads(body.decode())
+
 
 def get(key, prompt, help, default=None, values=None, check=None):
     v = None
-    if not default and vals[key]: default = vals[key]
+    if not default and vals[key]:
+        default = vals[key]
     while not v:
-        v = input(prompt +
-                  (' [' + default +']' if default else '') + ': ')
+        v = input(prompt + (' [' + default + ']' if default else '') + ': ')
         if v == '?':
             print()
             print(help, end='\n\n')
             v = None
-        if v == '' and default: v = default
+        if v == '' and default:
+            v = default
         if v and values and v not in values:
             msg = textwrap.fill('Invalid selection.  Must be one of: ' +
                                 ', '.join(values))
             print('\n' + msg + '\n')
             v = ''
-        if v and check and not check(v): v = ''
+        if v and check and not check(v):
+            v = ''
     vals[key] = v
