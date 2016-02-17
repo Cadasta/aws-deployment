@@ -7,7 +7,7 @@
 - name: Create ONA media directory
   become: yes
   become_user: root
-  file: path=/var/ona/media state=directory owner=ona group=www-data mode=0765
+  file: path=/var/ona/media state=directory owner=ona group=www-data mode=0775
 
 - name: Create Postgres password file for ONA
   become: yes
